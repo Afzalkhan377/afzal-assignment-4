@@ -16,26 +16,30 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
 
-    - name: Set up Python 3.10
+    - name: Set up Python 3.9
       uses: actions/setup-python@v2
       with:
-        python-version: '3.10'
+        python-version: '3.9'
 
-    - name: Install dependencies
-      run: make install
+    - name: Create and activate virtual environment
+      run: |
+        python3 -m venv venv
+        . venv/bin/activate
+        pip install -r requirements.txt
 
     - name: Run flake8 linter
       run: |
+        . venv/bin/activate
         pip install flake8
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=88 --statistics
 
     - name: Run the application
       run: |
+        . venv/bin/activate
         make run &
         sleep 10
         pkill -f "flask"
 
     - name: Verify the server is running
       run: curl --fail http://localhost:3000
-
