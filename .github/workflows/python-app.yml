@@ -21,11 +21,10 @@ jobs:
       with:
         python-version: '3.9'
 
-    - name: Create and activate virtual environment
+    - name: Install dependencies using Makefile
       run: |
-        python3 -m venv venv
-        . venv/bin/activate
-        pip install -r requirements.txt
+        sudo apt-get install python3-venv
+        make install
 
     - name: Run flake8 linter
       run: |
@@ -36,10 +35,10 @@ jobs:
 
     - name: Run the application
       run: |
-        . venv/bin/activate
         make run &
         sleep 10
         pkill -f "flask"
 
     - name: Verify the server is running
       run: curl --fail http://localhost:3000
+
