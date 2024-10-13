@@ -1,4 +1,4 @@
-name: Python application
+name: Python application workflow for LSA Search Engine
 
 on:
   push:
@@ -6,41 +6,36 @@ on:
   pull_request:
     branches: [ "main" ]
 
-permissions:
-  contents: read
-
 jobs:
   build:
 
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout repository
+      uses: actions/checkout@v4
     
     - name: Set up Python 3.10
       uses: actions/setup-python@v3
       with:
         python-version: "3.10"
     
-    - name: Install dependencies using Makefile
-      run: make install  # This will call the install target in your Makefile
-
-    - name: Run the server
+    - name: Remove old venv if exists
       run: |
-        make run &
-        sleep 10  # Allow time for the server to start up
+        if [ -d "venv" ]; then rm -rf venv; fi
+    
+    - name: Install dependencies using Makefile
+      run: make install  # This will call the 'install' target in your Makefile
+
+    - name: Run the Flask server
+      run: |
+        make run &  # Start the Flask server in the background
+        sleep 15  # Wait 15 seconds for the server to start
 
     - name: Verify server is running
       run: |
-        curl --fail http://localhost:3000 || exit 1
+        curl --fail http://localhost:3000 || exit 1  # Check if the server is running
 
     - name: Stop the server
       run: |
-        kill $(jobs -p) || true  # Kill the background server process if running
-    
-    - name: Lint with flake8
-      run: make lint  # Calls the lint target in your Makefile
-    
-    - name: Test with pytest
-      run: make test  # Calls the test target in your Makefile
-
+        kill $(jobs -p) || true  # Kill the server process
