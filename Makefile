@@ -1,4 +1,7 @@
 install:
-    pip install -r requirements.txt
+	
+	pip install -r requirements.txt
+
 run:
-    python app.py  
+	
+	python app.py
